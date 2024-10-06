@@ -1,0 +1,11 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Reload PM2 Server",
+            "type": "shell",
+            "command": "pm2 reload vmess",
+            "problemMatcher": []
+        }
+    ]
+}

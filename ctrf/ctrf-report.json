@@ -1,0 +1,76 @@
+{
+  "results": {
+    "tool": {
+      "name": "jest"
+    },
+    "summary": {
+      "tests": 5,
+      "passed": 4,
+      "failed": 1,
+      "pending": 0,
+      "skipped": 0,
+      "other": 0,
+      "start": 1728187561395,
+      "stop": 1728187564062
+    },
+    "tests": [
+      {
+        "name": "Test chức năng đổi mật khẩu sau quên mật khẩu Đổi mật khẩu thành công với tempToken hợp lệ",
+        "duration": 278,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\resetPassword.test.js",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\resetPassword.test.js > Test chức năng đổi mật khẩu sau quên mật khẩu"
+      },
+      {
+        "name": "Test chức năng đổi mật khẩu sau quên mật khẩu Đổi mật khẩu thất bại với tempToken không hợp lệ",
+        "duration": 17,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\resetPassword.test.js",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\resetPassword.test.js > Test chức năng đổi mật khẩu sau quên mật khẩu"
+      },
+      {
+        "name": "Test chức năng đổi mật khẩu sau quên mật khẩu Đổi mật khẩu thất bại khi không gửi tempToken",
+        "duration": 15,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\resetPassword.test.js",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\resetPassword.test.js > Test chức năng đổi mật khẩu sau quên mật khẩu"
+      },
+      {
+        "name": "Test chức năng đổi mật khẩu sau quên mật khẩu Đổi mật khẩu thất bại khi không gửi newPassword",
+        "duration": 14,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\resetPassword.test.js",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\resetPassword.test.js > Test chức năng đổi mật khẩu sau quên mật khẩu"
+      },
+      {
+        "name": "Test chức năng đổi mật khẩu sau quên mật khẩu Lỗi khi server không thể đổi mật khẩu",
+        "duration": 18,
+        "status": "failed",
+        "message": "Error: expect(received).toEqual(expected) // deep equality\n\nExpected: 500\nReceived: 400\n",
+        "trace": "at Object.toEqual (C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\resetPassword.test.js:126:24)\nat processTicksAndRejections (node:internal/process/task_queues:95:5)\n\n[object Object]",
+        "rawStatus": "failed",
+        "type": "unit",
+        "filePath": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\resetPassword.test.js",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\resetPassword.test.js > Test chức năng đổi mật khẩu sau quên mật khẩu"
+      }
+    ]
+  }
+}
