@@ -5,71 +5,69 @@
     },
     "summary": {
       "tests": 5,
-      "passed": 4,
-      "failed": 1,
+      "passed": 5,
+      "failed": 0,
       "pending": 0,
       "skipped": 0,
       "other": 0,
-      "start": 1728187561395,
-      "stop": 1728187564062
+      "start": 1728957864330,
+      "stop": 1728957866990
     },
     "tests": [
       {
-        "name": "Test chức năng đổi mật khẩu sau quên mật khẩu Đổi mật khẩu thành công với tempToken hợp lệ",
-        "duration": 278,
+        "name": "Test API lấy danh sách phòng chat của người dùng Lấy danh sách phòng chat thành công",
+        "duration": 192,
         "status": "passed",
         "rawStatus": "passed",
         "type": "unit",
-        "filePath": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\resetPassword.test.js",
+        "filePath": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\rooms\\getUserRooms.test.js",
         "retries": 0,
         "flaky": false,
-        "suite": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\resetPassword.test.js > Test chức năng đổi mật khẩu sau quên mật khẩu"
+        "suite": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\rooms\\getUserRooms.test.js > Test API lấy danh sách phòng chat của người dùng"
       },
       {
-        "name": "Test chức năng đổi mật khẩu sau quên mật khẩu Đổi mật khẩu thất bại với tempToken không hợp lệ",
-        "duration": 17,
+        "name": "Test API lấy danh sách phòng chat của người dùng Không có phòng chat nào cho người dùng",
+        "duration": 69,
         "status": "passed",
         "rawStatus": "passed",
         "type": "unit",
-        "filePath": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\resetPassword.test.js",
+        "filePath": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\rooms\\getUserRooms.test.js",
         "retries": 0,
         "flaky": false,
-        "suite": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\resetPassword.test.js > Test chức năng đổi mật khẩu sau quên mật khẩu"
+        "suite": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\rooms\\getUserRooms.test.js > Test API lấy danh sách phòng chat của người dùng"
       },
       {
-        "name": "Test chức năng đổi mật khẩu sau quên mật khẩu Đổi mật khẩu thất bại khi không gửi tempToken",
-        "duration": 15,
+        "name": "Test API lấy danh sách phòng chat của người dùng Không có token (Unauthorized)",
+        "duration": 16,
         "status": "passed",
         "rawStatus": "passed",
         "type": "unit",
-        "filePath": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\resetPassword.test.js",
+        "filePath": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\rooms\\getUserRooms.test.js",
         "retries": 0,
         "flaky": false,
-        "suite": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\resetPassword.test.js > Test chức năng đổi mật khẩu sau quên mật khẩu"
+        "suite": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\rooms\\getUserRooms.test.js > Test API lấy danh sách phòng chat của người dùng"
       },
       {
-        "name": "Test chức năng đổi mật khẩu sau quên mật khẩu Đổi mật khẩu thất bại khi không gửi newPassword",
-        "duration": 14,
+        "name": "Test API lấy danh sách phòng chat của người dùng Token không hợp lệ",
+        "duration": 16,
         "status": "passed",
         "rawStatus": "passed",
         "type": "unit",
-        "filePath": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\resetPassword.test.js",
+        "filePath": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\rooms\\getUserRooms.test.js",
         "retries": 0,
         "flaky": false,
-        "suite": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\resetPassword.test.js > Test chức năng đổi mật khẩu sau quên mật khẩu"
+        "suite": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\rooms\\getUserRooms.test.js > Test API lấy danh sách phòng chat của người dùng"
       },
       {
-        "name": "Test chức năng đổi mật khẩu sau quên mật khẩu Lỗi khi server không thể đổi mật khẩu",
-        "duration": 18,
-        "status": "failed",
-        "message": "Error: expect(received).toEqual(expected) // deep equality\n\nExpected: 500\nReceived: 400\n",
-        "trace": "at Object.toEqual (C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\resetPassword.test.js:126:24)\nat processTicksAndRejections (node:internal/process/task_queues:95:5)\n\n[object Object]",
-        "rawStatus": "failed",
+        "name": "Test API lấy danh sách phòng chat của người dùng Lỗi hệ thống khi lấy danh sách phòng chat",
+        "duration": 95,
+        "status": "passed",
+        "rawStatus": "passed",
         "type": "unit",
-        "filePath": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\resetPassword.test.js",
+        "filePath": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\rooms\\getUserRooms.test.js",
         "retries": 0,
         "flaky": false,
-        "suite": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\resetPassword.test.js > Test chức năng đổi mật khẩu sau quên mật khẩu"
+        "suite": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\rooms\\getUserRooms.test.js > Test API lấy danh sách phòng chat của người dùng"
       }
     ]
   }

@@ -7,7 +7,7 @@
 
 var debug = require('debug')('2-back-end:server');
 var http = require('http');
-const socketIo = require('socket.io');
+const initSocket = require('../sockets'); // Đường dẫn tới file socket index
 var app = require('../app');
 /**
  * Get port from environment and store in Express.
@@ -21,23 +21,8 @@ app.set('port', port);
  */
 
 var server = http.createServer(app);
-const io = socketIo(server);
-/**
- * Listen on provided port, on all network interfaces.
- */
-// cấu hình socket
-io.on('connection', (socket) => {
-  console.log('New client connected:', socket.id);
+const io = initSocket(server); // Khởi tạo socket với server
 
-  // Lắng nghe sự kiện gửi tin nhắn
-  socket.on('sendMessage', (message) => {
-      io.emit('receiveMessage', message); // Gửi tin nhắn tới tất cả người dùng
-  });
-
-  socket.on('disconnect', () => {
-      console.log('Client disconnected:', socket.id);
-  });
-});
 
 server.listen(1002, () => {
   console.log('Server is running on port 1002');

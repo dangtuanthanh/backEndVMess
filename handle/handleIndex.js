@@ -239,6 +239,8 @@ async function login({ email, password }) {
         // Kiểm tra mật khẩu
         const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
         if (!isPasswordValid) {
+            console.log('mật khẩu không đúng');
+
             await transaction.rollback();
             return { success: false, message: "Email hoặc mật khẩu không đúng!" };
         }
@@ -282,9 +284,19 @@ async function verifyAccessToken(token) {
     try {
         // Xác thực JWT bằng secret key
         const decoded = jwt.verify(token, process.env.accessTokenSecret);
+        // Lấy thông tin người dùng
+        const userResult = await pool.request()
+            .input('userId', sql.Int, decoded.userId)
+            .query('SELECT userId, email, userName, profilePicture FROM users WHERE userId = @userId and isDelete = 0');
 
+        if (!userResult.recordset.length) {
+            await transaction.rollback();
+            return { success: false};
+        }
+
+        const user = userResult.recordset[0];
         // Nếu thành công, trả về thông tin userId từ token
-        return { success: true, userId: decoded.userId };
+        return { success: true, user: user };
     } catch (error) {
         console.error('Lỗi khi xác thực Access Token:', error);
         return { success: false };
@@ -535,8 +547,8 @@ async function verifyResetCode(email, code) {
 
         // Tạo token tạm thời sau khi mã được xác thực thành công
         const userId = resetCode.recordset[0].userId; // Giả sử bạn có userId từ bảng users
-        console.log('userId',userId);
-        
+        console.log('userId', userId);
+
         const tempToken = jwt.sign(
             { email, userId },  // Payload chứa email và userId
             process.env.temporaryTokenSecret,  // Sử dụng secret key để mã hóa token
@@ -563,38 +575,38 @@ async function verifyResetCode(email, code) {
 //hàm đặt mật khẩu mới
 async function resetPassword(email, newPassword) {
     const transaction = new sql.Transaction(pool);
-  
+
     try {
-      // Bắt đầu transaction
-      await transaction.begin();
-  
-      let request = new sql.Request(transaction);
-  
-      // 1. Cập nhật mật khẩu mới
-      await request
-        .input('email', sql.VarChar, email)
-        .input('passwordHash', sql.VarChar, await hashPassword(newPassword))
-        .input('updatedAt', sql.DateTime, new Date()) // Cập nhật thời gian thay đổi
-        .query('UPDATE users SET passwordHash = @passwordHash, updatedAt = @updatedAt WHERE email = @email');
-  
-      // 2. Xóa tất cả refresh tokens của user sau khi đổi mật khẩu
-      request = new sql.Request(transaction);
-      await request
-        .input('email', sql.VarChar, email)
-        .query('DELETE FROM refreshTokens WHERE userId = (SELECT userId FROM users WHERE email = @email)');
-  
-      // Commit transaction sau khi tất cả các truy vấn thành công
-      await transaction.commit();
-      return { success: true, message: "Mật khẩu đã được cập nhật và các phiên đăng nhập trước đã bị đăng xuất." };
-  
+        // Bắt đầu transaction
+        await transaction.begin();
+
+        let request = new sql.Request(transaction);
+
+        // 1. Cập nhật mật khẩu mới
+        await request
+            .input('email', sql.VarChar, email)
+            .input('passwordHash', sql.VarChar, await hashPassword(newPassword))
+            .input('updatedAt', sql.DateTime, new Date()) // Cập nhật thời gian thay đổi
+            .query('UPDATE users SET passwordHash = @passwordHash, updatedAt = @updatedAt WHERE email = @email');
+
+        // 2. Xóa tất cả refresh tokens của user sau khi đổi mật khẩu
+        request = new sql.Request(transaction);
+        await request
+            .input('email', sql.VarChar, email)
+            .query('DELETE FROM refreshTokens WHERE userId = (SELECT userId FROM users WHERE email = @email)');
+
+        // Commit transaction sau khi tất cả các truy vấn thành công
+        await transaction.commit();
+        return { success: true, message: "Mật khẩu đã được cập nhật và các phiên đăng nhập trước đã bị đăng xuất." };
+
     } catch (error) {
-      // Rollback nếu có lỗi
-      await transaction.rollback();
-      console.error('Lỗi khi đổi mật khẩu:', error);
-      return { success: false, message: "Đã xảy ra lỗi khi đổi mật khẩu." };
+        // Rollback nếu có lỗi
+        await transaction.rollback();
+        console.error('Lỗi khi đổi mật khẩu:', error);
+        return { success: false, message: "Đã xảy ra lỗi khi đổi mật khẩu." };
     }
-  }
-  
+}
+
 module.exports = {
     register,
     verifyCode,

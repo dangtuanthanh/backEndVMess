@@ -1,7 +1,7 @@
 const swaggerAutogen = require('swagger-autogen')();
 
 const outputFile = './swagger/swaggerOutput.json'; // File output Swagger
-const endpointsFiles = ['./routes/index.js']; // Các file route của bạn
+const endpointsFiles = ['./routes/index.js','./routes/room.js','./routes/message.js']; // Các file route của bạn
 
 // Cấu hình Swagger tùy chỉnh
 const doc = {
@@ -21,6 +21,16 @@ const doc = {
         {
             name: 'Auth',  // Tên tag
             description: 'Authentication related endpoints'  // Mô tả tag
+        }
+        ,
+        {
+            name: 'Room',  // Tên tag
+            description: 'Chat room management related endpoints'  // Mô tả tag
+        }
+        ,
+        {
+            name: 'Message',  // Tên tag
+            description: 'Message management related endpoints'  // Mô tả tag
         }
     ]
 };

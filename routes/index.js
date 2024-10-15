@@ -4,7 +4,7 @@ const bodyParser = require('body-parser');
 const sql = require("../handle/handleIndex");
 const jwt = require('jsonwebtoken');
 router.use(bodyParser.json());//cho phép xử lý dữ liệu gửi lên dạng json
-router.use(bodyParser.urlencoded({ extended: false }));//cho phép xử lý dữ liệu gửi lên dạng application/x-www-form-urlencoded
+// router.use(bodyParser.urlencoded({ extended: false }));//cho phép xử lý dữ liệu gửi lên dạng application/x-www-form-urlencoded
 
 // Regex kiểm tra email hợp lệ
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -101,7 +101,7 @@ router.post('/login', async function (req, res) {
 
     if (result.success) {
       // Tạo access token và refresh token
-      const accessToken = jwt.sign({ userId: result.userId }, process.env.accessTokenSecret, { expiresIn: '15m' });
+      const accessToken = jwt.sign({ userId: result.userId }, process.env.accessTokenSecret, { expiresIn: '7d' });
       const refreshToken = jwt.sign({ userId: result.userId }, process.env.refreshTokenSecret, { expiresIn: '7d' });
 
       // Lưu refresh token vào cơ sở dữ liệu
@@ -140,7 +140,7 @@ router.post('/checkToken', async function (req, res) {
     const result = await sql.verifyAccessToken(accessToken);
 
     if (result.success) {
-      return res.status(200).json({ success: true, message: "Access Token hợp lệ.", userId: result.userId });
+      return res.status(200).json({ success: true, message: "Access Token hợp lệ.", user: result.user });
     } else {
       return res.status(401).json({ success: false, message: "Access Token không hợp lệ hoặc đã hết hạn!" });
     }
@@ -353,5 +353,7 @@ router.post('/resetPassword', async function (req, res) {
 });
 
 //#endregion
+
+
 module.exports = router;
 
