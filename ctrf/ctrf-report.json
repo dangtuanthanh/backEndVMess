@@ -4,70 +4,94 @@
       "name": "jest"
     },
     "summary": {
-      "tests": 5,
-      "passed": 5,
-      "failed": 0,
+      "tests": 7,
+      "passed": 6,
+      "failed": 1,
       "pending": 0,
       "skipped": 0,
       "other": 0,
-      "start": 1728957864330,
-      "stop": 1728957866990
+      "start": 1729300747404,
+      "stop": 1729300755918
     },
     "tests": [
       {
-        "name": "Test API lấy danh sách phòng chat của người dùng Lấy danh sách phòng chat thành công",
-        "duration": 192,
+        "name": "Test API đổi mật khẩu Đổi mật khẩu thành công",
+        "duration": 428,
         "status": "passed",
         "rawStatus": "passed",
         "type": "unit",
-        "filePath": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\rooms\\getUserRooms.test.js",
+        "filePath": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\users\\changePassword.test.js",
         "retries": 0,
         "flaky": false,
-        "suite": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\rooms\\getUserRooms.test.js > Test API lấy danh sách phòng chat của người dùng"
+        "suite": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\users\\changePassword.test.js > Test API đổi mật khẩu"
       },
       {
-        "name": "Test API lấy danh sách phòng chat của người dùng Không có phòng chat nào cho người dùng",
-        "duration": 69,
+        "name": "Test API đổi mật khẩu Thất bại vì không có dữ liệu gửi lên",
+        "duration": 20,
         "status": "passed",
         "rawStatus": "passed",
         "type": "unit",
-        "filePath": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\rooms\\getUserRooms.test.js",
+        "filePath": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\users\\changePassword.test.js",
         "retries": 0,
         "flaky": false,
-        "suite": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\rooms\\getUserRooms.test.js > Test API lấy danh sách phòng chat của người dùng"
+        "suite": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\users\\changePassword.test.js > Test API đổi mật khẩu"
       },
       {
-        "name": "Test API lấy danh sách phòng chat của người dùng Không có token (Unauthorized)",
+        "name": "Test API đổi mật khẩu Thất bại vì mật khẩu cũ không chính xác",
+        "duration": 125,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\users\\changePassword.test.js",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\users\\changePassword.test.js > Test API đổi mật khẩu"
+      },
+      {
+        "name": "Test API đổi mật khẩu Thất bại vì mật khẩu mới trùng với mật khẩu cũ",
+        "duration": 243,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\users\\changePassword.test.js",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\users\\changePassword.test.js > Test API đổi mật khẩu"
+      },
+      {
+        "name": "Test API đổi mật khẩu Thất bại vì không có refresh token",
+        "duration": 17,
+        "status": "passed",
+        "rawStatus": "passed",
+        "type": "unit",
+        "filePath": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\users\\changePassword.test.js",
+        "retries": 0,
+        "flaky": false,
+        "suite": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\users\\changePassword.test.js > Test API đổi mật khẩu"
+      },
+      {
+        "name": "Test API đổi mật khẩu Thất bại vì token không hợp lệ",
         "duration": 16,
         "status": "passed",
         "rawStatus": "passed",
         "type": "unit",
-        "filePath": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\rooms\\getUserRooms.test.js",
+        "filePath": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\users\\changePassword.test.js",
         "retries": 0,
         "flaky": false,
-        "suite": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\rooms\\getUserRooms.test.js > Test API lấy danh sách phòng chat của người dùng"
+        "suite": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\users\\changePassword.test.js > Test API đổi mật khẩu"
       },
       {
-        "name": "Test API lấy danh sách phòng chat của người dùng Token không hợp lệ",
-        "duration": 16,
-        "status": "passed",
-        "rawStatus": "passed",
+        "name": "Test API đổi mật khẩu Lỗi hệ thống khi đổi mật khẩu",
+        "duration": 5004,
+        "status": "failed",
+        "message": "Error: thrown: \"Exceeded timeout of 5000 ms for a test.\nAdd a timeout value to this test to increase the timeout, if this is a long-running test. See https://jestjs.io/docs/api#testname-fn-timeout.\"\n",
+        "trace": "at test (C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\users\\changePassword.test.js:127:3)\nat _dispatchDescribe (C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\node_modules\\jest-circus\\build\\index.js:91:26)\nat describe (C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\node_modules\\jest-circus\\build\\index.js:55:5)\nat Object.describe (C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\users\\changePassword.test.js:21:1)\nat Runtime._execModule (C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\node_modules\\jest-runtime\\build\\index.js:1439:24)\nat Runtime._loadModule (C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\node_modules\\jest-runtime\\build\\index.js:1022:12)\nat Runtime.requireModule (C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\node_modules\\jest-runtime\\build\\index.js:882:12)\nat jestAdapter (C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\node_modules\\jest-circus\\build\\legacy-code-todo-rewrite\\jestAdapter.js:77:13)\nat processTicksAndRejections (node:internal/process/task_queues:95:5)\nat runTestInternal (C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\node_modules\\jest-runner\\build\\runTest.js:367:16)\nat runTest (C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\node_modules\\jest-runner\\build\\runTest.js:444:34)\n\n[object Object]",
+        "rawStatus": "failed",
         "type": "unit",
-        "filePath": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\rooms\\getUserRooms.test.js",
+        "filePath": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\users\\changePassword.test.js",
         "retries": 0,
         "flaky": false,
-        "suite": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\rooms\\getUserRooms.test.js > Test API lấy danh sách phòng chat của người dùng"
-      },
-      {
-        "name": "Test API lấy danh sách phòng chat của người dùng Lỗi hệ thống khi lấy danh sách phòng chat",
-        "duration": 95,
-        "status": "passed",
-        "rawStatus": "passed",
-        "type": "unit",
-        "filePath": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\rooms\\getUserRooms.test.js",
-        "retries": 0,
-        "flaky": false,
-        "suite": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\rooms\\getUserRooms.test.js > Test API lấy danh sách phòng chat của người dùng"
+        "suite": "C:\\Users\\Admin\\Desktop\\VMess\\2-Back-End\\tests\\users\\changePassword.test.js > Test API đổi mật khẩu"
       }
     ]
   }

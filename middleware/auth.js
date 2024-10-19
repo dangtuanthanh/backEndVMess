@@ -1,3 +1,4 @@
+//auth.js
 const jwt = require('jsonwebtoken');
 
 // Middleware xác thực access token

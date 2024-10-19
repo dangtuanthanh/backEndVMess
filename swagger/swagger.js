@@ -1,7 +1,7 @@
 const swaggerAutogen = require('swagger-autogen')();
 
 const outputFile = './swagger/swaggerOutput.json'; // File output Swagger
-const endpointsFiles = ['./routes/index.js','./routes/room.js','./routes/message.js']; // Các file route của bạn
+const endpointsFiles = ['./routes/index.js','./routes/room.js','./routes/message.js','./routes/users.js']; // Các file route của bạn
 
 // Cấu hình Swagger tùy chỉnh
 const doc = {
@@ -31,6 +31,11 @@ const doc = {
         {
             name: 'Message',  // Tên tag
             description: 'Message management related endpoints'  // Mô tả tag
+        }
+        ,
+        {
+            name: 'User Profile',  // Tên tag
+            description: 'User profile management related endpoints'  // Mô tả tag
         }
     ]
 };

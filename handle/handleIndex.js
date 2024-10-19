@@ -64,11 +64,19 @@ async function register(data) {
 
 
         // Tạo người dùng mới
+        const userName = email.split('@')[0]; // Lấy phần trước dấu @ từ email làm userName
+
         request = new sql.Request(transaction);
         const resultCreateAccount = await request
             .input('email', sql.VarChar, email)
             .input('passwordHash', sql.VarChar, await hashPassword(password))
-            .query('INSERT INTO users (email, passwordHash) VALUES (@email, @passwordHash); SELECT SCOPE_IDENTITY() AS userId');
+            .input('userName', sql.NVarChar, userName) // Chèn userName vào cột userName
+            .query(`
+    INSERT INTO users (email, passwordHash, userName) 
+    VALUES (@email, @passwordHash, @userName); 
+    SELECT SCOPE_IDENTITY() AS userId
+  `);
+
 
         const userId = resultCreateAccount.recordset[0].userId;
 
@@ -291,7 +299,7 @@ async function verifyAccessToken(token) {
 
         if (!userResult.recordset.length) {
             await transaction.rollback();
-            return { success: false};
+            return { success: false };
         }
 
         const user = userResult.recordset[0];
@@ -432,11 +440,13 @@ async function googleLogin(tokenId) {
         }
 
         // Tạo tài khoản mới với thông tin Google
+        const userName = email.split('@')[0]; // Lấy phần trước dấu @ từ email làm userName
         request = new sql.Request(transaction);
         const resultCreateAccount = await request
             .input('email', sql.VarChar, email)
             .input('googleId', sql.VarChar, googleId)
-            .query('INSERT INTO users (email, googleId, isVerified) VALUES (@email, @googleId, 1); SELECT SCOPE_IDENTITY() AS userId');
+            .input('userName', sql.NVarChar, userName) // Chèn userName vào cột userName
+            .query('INSERT INTO users (email, googleId, isVerified, userName) VALUES (@email, @googleId, 1,@userName); SELECT SCOPE_IDENTITY() AS userId');
 
         const userId = resultCreateAccount.recordset[0].userId;
         await transaction.commit();

@@ -8,6 +8,10 @@ router.use(bodyParser.json());//cho phép xử lý dữ liệu gửi lên dạng
 
 // Sửa tin nhắn trong phòng chat
 router.put('/editMessage/:messageId', authenticateToken, async function (req, res) {
+  // #swagger.tags = ['Message']
+  // #swagger.summary = 'Sửa tin nhắn'
+  // #swagger.description = 'Endpoint để sửa nội dung tin nhắn trong phòng chat'
+
   const { messageId } = req.params;
   const { newMessageContent, roomId } = req.body;
   const userId = req.user.userId; // Lấy ID người dùng từ token

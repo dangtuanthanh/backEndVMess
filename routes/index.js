@@ -3,8 +3,15 @@ var router = express.Router();
 const bodyParser = require('body-parser');
 const sql = require("../handle/handleIndex");
 const jwt = require('jsonwebtoken');
+const { authenticateToken } = require("../middleware/auth");
 router.use(bodyParser.json());//cho phép xử lý dữ liệu gửi lên dạng json
 // router.use(bodyParser.urlencoded({ extended: false }));//cho phép xử lý dữ liệu gửi lên dạng application/x-www-form-urlencoded
+
+// import xử lý ảnh
+const multer = require('multer');
+const sharp = require('sharp');
+const path = require('path');
+const fs = require('fs');
 
 // Regex kiểm tra email hợp lệ
 const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -107,11 +114,17 @@ router.post('/login', async function (req, res) {
       // Lưu refresh token vào cơ sở dữ liệu
       await sql.saveRefreshToken(result.userId, refreshToken);
 
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,   // Chỉ cho phép HTTP truy cập, không cho JavaScript
+        secure: false,    // Tạm thời không bật chế độ bảo mật HTTPS
+        sameSite: 'Strict', // Không gửi cookie với các request ngoài cùng nguồn
+        maxAge: 7 * 24 * 60 * 60 * 1000 // Thời gian sống 7 ngày
+      });
+      
       res.status(200).json({
         success: true,
         message: 'Đăng nhập thành công.',
-        accessToken: accessToken,
-        refreshToken: refreshToken
+        accessToken: accessToken
       });
     } else {
       res.status(400).json({ success: false, message: result.message });
@@ -351,8 +364,8 @@ router.post('/resetPassword', async function (req, res) {
     return res.status(500).json({ success: false, message: "Đã xảy ra lỗi khi đổi mật khẩu." });
   }
 });
-
 //#endregion
+
 
 
 module.exports = router;
