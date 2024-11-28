@@ -28,10 +28,25 @@ app.use(helmet()); // Áp dụng bảo mật cho toàn bộ app
 
 // bảo mật cors
 const cors = require('cors');
+const allowedOrigins = [
+  'http://localhost:3000',
+  'https://frontendvmess.onrender.com',
+  'http://3.nhahang.xyz'
+];
+
 app.use(cors({
-  origin: 'http://localhost:3000',  // Địa chỉ của ứng dụng React
-  credentials: true                // Cho phép gửi/nhận cookie
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.includes(origin)) {
+      // Nếu origin không có (cho các request từ cùng nguồn) hoặc hợp lệ
+      callback(null, true);
+    } else {
+      // Nếu origin không được phép
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+  credentials: true // Cho phép cookie
 }));
+
 
 // app.use(cors());
 // Cấu hình cors để chỉ cho phép một số domain nhất định truy cập
