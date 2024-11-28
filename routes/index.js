@@ -120,7 +120,7 @@ router.post('/login', async function (req, res) {
         sameSite: 'Strict', // Không gửi cookie với các request ngoài cùng nguồn
         maxAge: 7 * 24 * 60 * 60 * 1000 // Thời gian sống 7 ngày
       });
-      
+
       res.status(200).json({
         success: true,
         message: 'Đăng nhập thành công.',
@@ -168,8 +168,7 @@ router.post('/refreshToken', async function (req, res) {
   // #swagger.tags = ['Auth']
   // #swagger.summary = 'Làm mới Access Token'
   // #swagger.description = 'Endpoint để lấy Access Token mới bằng Refresh Token.'
-  const { refreshToken } = req.body;
-
+  const refreshToken = req.cookies.refreshToken;
   // Kiểm tra dữ liệu đầu vào
   if (!refreshToken) {
     return res.status(400).json({ success: false, message: "Refresh Token không được gửi lên!" });
@@ -179,14 +178,17 @@ router.post('/refreshToken', async function (req, res) {
     // Gọi hàm xử lý làm mới token từ file handleIndex.js
     const result = await sql.refreshAccessToken(refreshToken);
 
+
     if (result.success) {
       // Tạo Access Token mới
-      const newAccessToken = jwt.sign({ userId: result.userId }, process.env.accessTokenSecret, { expiresIn: '15m' });
+      console.log('result.user.userId', result.user.userId);
+      const newAccessToken = jwt.sign({ userId: result.user.userId }, process.env.accessTokenSecret, { expiresIn: '15m' });
 
       res.status(200).json({
         success: true,
         message: 'Làm mới Access Token thành công.',
-        accessToken: newAccessToken
+        accessToken: newAccessToken,
+        user: result.user
       });
     } else {
       res.status(400).json({ success: false, message: result.message });
@@ -203,7 +205,7 @@ router.post('/logout', async function (req, res) {
   // #swagger.summary = 'Đăng xuất'
   // #swagger.description = 'Endpoint để đăng xuất và xóa Refresh Token.'
 
-  const { refreshToken } = req.body;
+  const refreshToken = req.cookies.refreshToken;
 
   // Kiểm tra dữ liệu đầu vào
   if (!refreshToken) {
@@ -215,6 +217,13 @@ router.post('/logout', async function (req, res) {
     const result = await sql.logout(refreshToken);
 
     if (result.success) {
+      res.cookie('refreshToken', '', {
+        httpOnly: true,
+        secure: false, // Nếu triển khai thực tế, nên đặt thành true khi sử dụng HTTPS
+        sameSite: 'Strict',
+        maxAge: 0 // Xóa cookie ngay lập tức
+      });
+
       res.status(200).json({
         success: true,
         message: 'Đăng xuất thành công.'
@@ -250,12 +259,16 @@ router.post('/googleLogin', async function (req, res) {
 
       // Lưu refresh token vào cơ sở dữ liệu
       await sql.saveRefreshToken(result.userId, refreshToken);
-
+      res.cookie('refreshToken', refreshToken, {
+        httpOnly: true,   // Chỉ cho phép HTTP truy cập, không cho JavaScript
+        secure: false,    // Tạm thời không bật chế độ bảo mật HTTPS
+        sameSite: 'Strict', // Không gửi cookie với các request ngoài cùng nguồn
+        maxAge: 7 * 24 * 60 * 60 * 1000 // Thời gian sống 7 ngày
+      });
       return res.status(200).json({
         success: true,
         message: 'Đăng nhập bằng Google thành công.',
-        accessToken: accessToken,
-        refreshToken: refreshToken
+        accessToken: accessToken
       });
     } else {
       return res.status(result.status || 400).json({ success: false, message: result.message });
@@ -312,7 +325,13 @@ router.post('/verifyResetCode', async function (req, res) {
     const result = await sql.verifyResetCode(email, code);
 
     if (result.success) {
-      res.status(200).json({ success: true, message: "Mã xác thực hợp lệ. Bạn có thể đổi mật khẩu.", tempToken: result.tempToken });
+      res.cookie('tempToken', result.tempToken, {
+        httpOnly: true,   // Chỉ cho phép HTTP truy cập, không cho JavaScript
+        secure: false,    // Tạm thời không bật chế độ bảo mật HTTPS
+        sameSite: 'Strict', // Không gửi cookie với các request ngoài cùng nguồn
+        maxAge: 15 * 60 * 1000  // Thời gian sống 15p
+      });
+      res.status(200).json({ success: true, message: "Mã xác thực hợp lệ. Bạn có thể đổi mật khẩu." });
       console.log('tokenAPIverifyResetCode', result.tempToken);
 
     } else {
@@ -329,8 +348,8 @@ router.post('/resetPassword', async function (req, res) {
   // #swagger.summary = 'Đổi mật khẩu mới trong chức năng quên mật khẩu'
   // #swagger.description = 'Endpoint Đổi mật khẩu mới trong chức năng quên mật khẩu'
 
-  const { tempToken, newPassword } = req.body;
-
+  const { newPassword } = req.body;
+  const tempToken = req.cookies.tempToken;
   // Kiểm tra dữ liệu đầu vào
   if (!tempToken || !newPassword) {
     return res.status(400).json({ success: false, message: "Dữ liệu không chính xác!" });

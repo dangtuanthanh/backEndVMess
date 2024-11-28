@@ -21,7 +21,8 @@ router.get('/searchUser', authenticateToken, async function (req, res) {
 
   try {
     // Gọi hàm tìm kiếm từ file handleRoom
-    const result = await sql.searchUser(search, offset, limit);
+    
+    const result = await sql.searchUser(search, offset, limit,req.user.userId);
 
     if (result.success) {
       // Tính tổng số trang
@@ -74,7 +75,7 @@ router.post('/createRoom', authenticateToken, async function (req, res) {
     if (result.success) {
       res.status(201).json({ success: true, roomId: result.roomId, message: "Phòng chat đã được tạo thành công." });
     } else {
-      res.status(400).json({ success: false, message: result.message });
+      res.status(400).json( result );
     }
   } catch (error) {
     console.error('Tạo phòng chat thất bại:', error);
@@ -127,16 +128,21 @@ router.get('/getUserRooms', authenticateToken, async function (req, res) {
   // #swagger.summary = 'Lấy danh sách phòng chat của người dùng'
   // #swagger.description = 'Endpoint để lấy danh sách các phòng chat của người dùng hiện tại.'
   const userId = req.user.userId; // Lấy userId từ token đã được xác thực
-
+  const { page = 1, limit = 20 } = req.query; // Mặc định là trang 1 và giới hạn 20 tin nhắn
+  const offset = (page - 1) * limit;
   try {
     // Gọi hàm lấy danh sách phòng từ file handleRoom
-    const result = await sql.getUserRooms(userId);
+    const result = await sql.getUserRooms(userId, offset, limit);
 
     if (result.success) {
       res.status(200).json({
         success: true,
         rooms: result.rooms,
-        totalRooms: result.rooms.length, // Tổng số phòng
+        totalRecords: result.total, // Tổng số phòng
+        currentRecords: result.rooms.length,
+        pageSize: parseInt(limit),
+        currentPage: parseInt(page),
+        totalPages: Math.ceil(result.total / limit),
       });
     } else {
       res.status(404).json({ success: false, message: result.message });

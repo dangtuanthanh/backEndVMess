@@ -195,20 +195,6 @@
         ],
         "summary": "Làm mới Access Token",
         "description": "Endpoint để lấy Access Token mới bằng Refresh Token.",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "refreshToken": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -229,20 +215,6 @@
         ],
         "summary": "Đăng xuất",
         "description": "Endpoint để đăng xuất và xóa Refresh Token.",
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "refreshToken": {
-                  "example": "any"
-                }
-              }
-            }
-          }
-        ],
         "responses": {
           "200": {
             "description": "OK"
@@ -375,9 +347,6 @@
             "schema": {
               "type": "object",
               "properties": {
-                "tempToken": {
-                  "example": "any"
-                },
                 "newPassword": {
                   "example": "any"
                 }
@@ -555,6 +524,16 @@
         "description": "Endpoint để lấy danh sách các phòng chat của người dùng hiện tại.",
         "parameters": [
           {
+            "name": "page",
+            "in": "query",
+            "type": "string"
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "type": "string"
+          },
+          {
             "name": "authorization",
             "in": "header",
             "type": "string"
@@ -606,9 +585,6 @@
               "properties": {
                 "newMessageContent": {
                   "example": "any"
-                },
-                "roomId": {
-                  "example": "any"
                 }
               }
             }
@@ -651,18 +627,6 @@
             "name": "authorization",
             "in": "header",
             "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "schema": {
-              "type": "object",
-              "properties": {
-                "roomId": {
-                  "example": "any"
-                }
-              }
-            }
           }
         ],
         "responses": {
@@ -710,45 +674,6 @@
           },
           "403": {
             "description": "Forbidden"
-          },
-          "500": {
-            "description": "Internal Server Error"
-          }
-        }
-      }
-    },
-    "/uploads/profilePictures/{filename}": {
-      "get": {
-        "tags": [
-          "User Profile"
-        ],
-        "summary": "Lấy ảnh hồ sơ",
-        "description": "Endpoint để lấy ảnh hồ sơ người dùng với xác thực",
-        "parameters": [
-          {
-            "name": "filename",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "authorization",
-            "in": "header",
-            "type": "string"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          },
-          "401": {
-            "description": "Unauthorized"
-          },
-          "403": {
-            "description": "Forbidden"
-          },
-          "404": {
-            "description": "Not Found"
           },
           "500": {
             "description": "Internal Server Error"

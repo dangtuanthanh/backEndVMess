@@ -2,8 +2,13 @@
 const socketIo = require('socket.io');
 const handleSocket = require('./handleSocket');
 
-function initSocket(server) {
-  const io = socketIo(server);
+function initSocket(server  ) {
+  const io = socketIo(server, {
+    cors: {
+      origin: "http://localhost:3000", // hoặc '*'
+      credentials: true
+    }
+  });
   io.use(require('./socketMiddleware'));
   io.on('connection', (socket) => {
     console.log('New client connected:', socket.userId);

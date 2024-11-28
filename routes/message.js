@@ -13,17 +13,17 @@ router.put('/editMessage/:messageId', authenticateToken, async function (req, re
   // #swagger.description = 'Endpoint để sửa nội dung tin nhắn trong phòng chat'
 
   const { messageId } = req.params;
-  const { newMessageContent, roomId } = req.body;
+  const { newMessageContent } = req.body;
   const userId = req.user.userId; // Lấy ID người dùng từ token
 
   // Kiểm tra dữ liệu đầu vào
-  if (!roomId || !newMessageContent || newMessageContent.trim() === '') {
+  if (!newMessageContent || newMessageContent.trim() === '') {
     return res.status(400).json({ success: false, message: 'Nội dung tin nhắn không hợp lệ!' });
   }
 
   try {
     // Gọi hàm xử lý sửa tin nhắn từ file handleMessage
-    const result = await sql.editMessage(messageId, userId, newMessageContent, roomId);
+    const result = await sql.editMessage(messageId, userId, newMessageContent);
 
     if (result.success) {
       res.status(200).json({ success: true, message: 'Tin nhắn đã được sửa thành công.', updatedMessage: result.updatedMessage });
@@ -43,20 +43,19 @@ router.delete('/deleteMessage/:messageId', authenticateToken, async function (re
   // #swagger.description = 'Endpoint để xóa tin nhắn trong phòng chat'
 
   const { messageId } = req.params;
-  const { roomId } = req.body;
   const userId = req.user.userId; // Lấy ID người dùng từ token
 
   // Kiểm tra dữ liệu đầu vào
-  if (!roomId) {
-    return res.status(400).json({ success: false, message: 'Phòng chat không hợp lệ!' });
+  if (!messageId) {
+    return res.status(400).json({ success: false, message: 'ID tin nhắn không hợp lệ!' });
   }
 
   try {
     // Gọi hàm xử lý xóa tin nhắn từ file handleMessage
-    const result = await sql.deleteMessage(messageId, userId, roomId);
+    const result = await sql.deleteMessage(messageId, userId);
 
     if (result.success) {
-      res.status(200).json({ success: true, message: 'Tin nhắn đã được xóa thành công.' });
+      res.status(200).json({ success: true, message: 'Tin nhắn đã được xóa thành công.',messageId:result.messageId });
     } else {
       res.status(result.statusCode).json({ success: false, message: result.message });
     }

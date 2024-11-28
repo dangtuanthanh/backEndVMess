@@ -65,6 +65,7 @@ async function register(data) {
 
         // Tạo người dùng mới
         const userName = email.split('@')[0]; // Lấy phần trước dấu @ từ email làm userName
+        console.log('userName', userName);
 
         request = new sql.Request(transaction);
         const resultCreateAccount = await request
@@ -79,6 +80,7 @@ async function register(data) {
 
 
         const userId = resultCreateAccount.recordset[0].userId;
+        console.log('userId', userId);
 
         // Sinh mã xác thực
         const verificationCode = generateRandomCode();
@@ -245,6 +247,10 @@ async function login({ email, password }) {
         }
 
         // Kiểm tra mật khẩu
+        if (!user.passwordHash) {
+            await transaction.rollback();
+            return { success: false, message: "Bạn chưa thiết lập mật khẩu cho tài khoản của mình. Vui lòng đăng nhập bằng tài khoản Google." };
+        }
         const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
         if (!isPasswordValid) {
             console.log('mật khẩu không đúng');
@@ -340,7 +346,7 @@ async function refreshAccessToken(refreshToken) {
         // Lấy thông tin người dùng
         const userResult = await request
             .input('userId', sql.Int, tokenData.userId)
-            .query('SELECT * FROM users WHERE userId = @userId and isDelete = 0');
+            .query('SELECT userId, email, userName, profilePicture FROM users WHERE userId = @userId and isDelete = 0');
 
         if (!userResult.recordset.length) {
             await transaction.rollback();
@@ -349,7 +355,7 @@ async function refreshAccessToken(refreshToken) {
 
         const user = userResult.recordset[0];
         await transaction.commit();
-        return { success: true, userId: user.userId };
+        return { success: true, user: user };
     } catch (error) {
         await transaction.rollback();
         console.error('Lỗi khi làm mới Access Token:', error);

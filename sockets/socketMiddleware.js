@@ -4,6 +4,7 @@ const jwt = require('jsonwebtoken');
 // Middleware kiểm tra token trước khi cho phép kết nối socket
 module.exports = (socket, next) => {
   const token = socket.handshake.query.token;
+console.log('token',token);
 
   if (!token) {
     return next(new Error('Token không tồn tại.'));

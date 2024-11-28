@@ -4,7 +4,7 @@ const pool = db.getPool();
 const sql = require('mssql');
 
 // Hàm xử lý sửa tin nhắn
-async function editMessage(messageId, userId, newMessageContent, roomId) {
+async function editMessage(messageId, userId, newMessageContent) {
   const transaction = new sql.Transaction(pool);
   await transaction.begin();
   messageId = Number(messageId);
@@ -56,7 +56,7 @@ async function editMessage(messageId, userId, newMessageContent, roomId) {
         minute: '2-digit'
       });
     }
-    return { success: true, updatedMessage: { messageId, newMessageContent, editedAt: currentTime, roomId } };
+    return { success: true, updatedMessage: { messageId, newMessageContent, editedAt: currentTime} };
   } catch (error) {
     await transaction.rollback();
     console.error('Lỗi khi sửa tin nhắn:', error);
@@ -65,7 +65,7 @@ async function editMessage(messageId, userId, newMessageContent, roomId) {
 }
 
 // Hàm xử lý xóa tin nhắn
-async function deleteMessage(messageId, userId, roomId) {
+async function deleteMessage(messageId, userId) {
   const transaction = new sql.Transaction(pool);
   await transaction.begin();
   messageId = Number(messageId);
@@ -98,7 +98,7 @@ async function deleteMessage(messageId, userId, roomId) {
       `);
 
     await transaction.commit();
-    return { success: true };
+    return { success: true,messageId:messageId };
   } catch (error) {
     await transaction.rollback();
     console.error('Lỗi khi xóa tin nhắn:', error);

@@ -20,7 +20,7 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 // cấu hình bảo mật
 //bảo mật header
 const helmet = require('helmet');
@@ -28,19 +28,25 @@ app.use(helmet()); // Áp dụng bảo mật cho toàn bộ app
 
 // bảo mật cors
 const cors = require('cors');
-app.use(cors());
+app.use(cors({
+  origin: 'http://localhost:3000',  // Địa chỉ của ứng dụng React
+  credentials: true                // Cho phép gửi/nhận cookie
+}));
+
+// app.use(cors());
 // Cấu hình cors để chỉ cho phép một số domain nhất định truy cập
 // app.use(cors({
 //     origin: 'http://your-frontend-url.com',
 //     methods: ['GET', 'POST', 'PUT', 'DELETE'],
 // }));
 
+
 // bảo mật rate limit
 const rateLimit = require('express-rate-limit');
 // Giới hạn mỗi IP chỉ có thể gửi 100 request mỗi 15 phút
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100 // giới hạn 100 requests trong mỗi 15 phút
+  max: 500 // giới hạn 100 requests trong mỗi 15 phút
 });
 app.use(limiter); // Áp dụng cho toàn bộ ứng dụng
 

@@ -4,7 +4,7 @@ const pool = db.getPool();
 const sql = require('mssql');
 
 // Hàm tìm kiếm người dùng theo email hoặc userName với phân trang
-async function searchUser(search, offset, limit) {
+async function searchUser(search, offset, limit, userId) {
   const transaction = new sql.Transaction(pool);
   await transaction.begin();
   try {
@@ -13,27 +13,25 @@ async function searchUser(search, offset, limit) {
       .input('search', sql.VarChar, `%${search}%`)
       .input('offset', sql.Int, offset)
       .input('limit', sql.Int, limit)
+      .input('userId', sql.Int, userId)
       .query(`
-        SELECT userId, email, userName 
+        SELECT userId, email, userName, profilePicture,
+               COUNT(*) OVER() AS totalCount
         FROM users 
-        WHERE email LIKE @search OR userName LIKE @search AND isDelete = 0
+        WHERE (email LIKE @search OR userName LIKE @search)
+          AND isDelete = 0
+          AND userId != @userId
         ORDER BY userName 
         OFFSET @offset ROWS 
         FETCH NEXT @limit ROWS ONLY
       `);
-
-    // Lấy tổng số người dùng tìm thấy
-    request = new sql.Request(transaction);
-    const total = await request
-      .input('search', sql.VarChar, `%${search}%`)
-      .query(`SELECT COUNT(*) AS total FROM users WHERE email LIKE @search OR userName LIKE @search`);
 
     if (result.recordset.length > 0) {
       await transaction.commit();
       return {
         success: true,
         users: result.recordset,
-        total: total.recordset[0].total // Tổng số bản ghi
+        total: result.recordset[0].totalCount // Tổng số bản ghi từ `COUNT(*) OVER()`
       };
     } else {
       await transaction.rollback();
@@ -58,18 +56,34 @@ async function createRoom(userId, targetUserId) {
       .input('userId', sql.Int, userId)
       .input('targetUserId', sql.Int, targetUserId)
       .query(`
-        SELECT r.roomId 
-        FROM rooms r
-        JOIN roomMembers rm1 ON r.roomId = rm1.roomId
-        JOIN roomMembers rm2 ON r.roomId = rm2.roomId
-        WHERE rm1.userId = @userId AND rm2.userId = @targetUserId AND r.isGroup = 0 AND r.isDelete = 0
-      `);
+    SELECT 
+      r.roomId, 
+      u.userName, 
+      u.profilePicture
+    FROM rooms r
+    JOIN roomMembers rm1 ON r.roomId = rm1.roomId
+    JOIN roomMembers rm2 ON r.roomId = rm2.roomId
+    JOIN users u ON rm2.userId = u.userId
+    WHERE 
+      rm1.userId = @userId 
+      AND rm2.userId = @targetUserId 
+      AND r.isGroup = 0 
+      AND r.isDelete = 0
+  `);
 
     // Nếu đã có phòng, trả về thông báo lỗi
     if (existingRoom.recordset.length > 0) {
+      const { roomId, userName, profilePicture } = existingRoom.recordset[0];
       await transaction.rollback();
-      return { success: false, message: "Phòng chat giữa hai người dùng đã tồn tại." };
+      return {
+        success: false,
+        message: "Phòng chat giữa hai người dùng đã tồn tại.",
+        roomId,
+        userName: userName,
+        profilePicture: profilePicture
+      };
     }
+
 
     // Nếu chưa có phòng, tạo phòng mới
     request = new sql.Request(transaction);
@@ -80,7 +94,7 @@ async function createRoom(userId, targetUserId) {
       .input('createdAt', sql.DateTime, currentTime)
       .query(`
         INSERT INTO rooms (roomName, isGroup, createdBy, createdAt) 
-        PUT INSERTED.roomId OUT
+        OUTPUT INSERTED.roomId 
         VALUES (@roomName, 0, @createdBy, @createdAt)
       `);
 
@@ -162,7 +176,7 @@ async function getRoomMessages(roomId, offset, limit) {
       .input('offset', sql.Int, offset)
       .input('limit', sql.Int, limit)
       .query(`
-        SELECT m.messageId, m.messageContent, m.createdAt, u.userName
+        SELECT m.messageId, m.messageContent, m.createdAt, m.senderId, u.userName, m.editedAt, m.isEdited
         FROM messages m
         JOIN users u ON m.senderId = u.userId
         WHERE m.roomId = @roomId AND m.isDelete = 0
@@ -189,7 +203,9 @@ async function getRoomMessages(roomId, offset, limit) {
         messageId: msg.messageId,
         messageContent: msg.messageContent,
         userName: msg.userName,
-        createdAt: new Date(msg.createdAt).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit'})
+        senderId: msg.senderId,
+        editedAt: msg.isEdited ? new Date(msg.editedAt).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' }) : null,
+        createdAt: new Date(msg.createdAt).toLocaleString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
 
       }));
       return {
@@ -208,7 +224,7 @@ async function getRoomMessages(roomId, offset, limit) {
 }
 
 // Hàm lấy danh sách phòng chat của người dùng
-async function getUserRooms(userId) {
+async function getUserRooms(userId, offset, limit) {
   const transaction = new sql.Transaction(pool);
   await transaction.begin();
 
@@ -218,13 +234,76 @@ async function getUserRooms(userId) {
     // Lấy thông tin phòng chat mà user là thành viên
     const result = await request
       .input('userId', sql.Int, userId)
+      .input('offset', sql.Int, offset)
+      .input('limit', sql.Int, limit)
       .query(`
-        SELECT r.roomId, r.roomName, rm.unreadMessagesCount, r.lastMessageTime
-        FROM roomMembers rm
-        INNER JOIN rooms r ON rm.roomId = r.roomId
-        WHERE rm.userId = @userId AND rm.isDelete = 0
-        ORDER BY r.lastMessageTime DESC
-      `);
+    SELECT 
+      r.roomId, 
+      r.roomName, 
+      rm.unreadMessagesCount, 
+      r.lastMessageTime,
+      r.isGroup,
+      CASE 
+        WHEN r.isGroup = 1 THEN r.roomImage
+        ELSE (
+          SELECT TOP 1 u.userName 
+          FROM roomMembers rm2
+          INNER JOIN users u ON rm2.userId = u.userId
+          WHERE rm2.roomId = r.roomId AND rm2.userId != @userId
+        ) 
+      END AS userName,
+      CASE 
+        WHEN r.isGroup = 0 THEN (
+          SELECT TOP 1 u.profilePicture
+          FROM roomMembers rm2
+          INNER JOIN users u ON rm2.userId = u.userId
+          WHERE rm2.roomId = r.roomId AND rm2.userId != @userId
+        )
+        ELSE NULL
+      END AS image,
+      CASE 
+        WHEN r.isGroup = 0 THEN (
+          SELECT TOP 1 u.email
+          FROM roomMembers rm2
+          INNER JOIN users u ON rm2.userId = u.userId
+          WHERE rm2.roomId = r.roomId AND rm2.userId != @userId
+        )
+        ELSE NULL
+      END AS email,
+      (
+        SELECT TOP 1 m.messageContent 
+        FROM messages m
+        WHERE m.roomId = r.roomId AND m.isDelete = 0
+        ORDER BY m.createdAt DESC
+      ) AS lastMessage
+    FROM roomMembers rm
+    INNER JOIN rooms r ON rm.roomId = r.roomId
+    WHERE rm.userId = @userId 
+      AND rm.isDelete = 0
+      AND EXISTS ( -- Chỉ lấy phòng có tin nhắn
+        SELECT 1
+        FROM messages m
+        WHERE m.roomId = r.roomId AND m.isDelete = 0
+      )
+    ORDER BY r.lastMessageTime DESC
+    OFFSET @offset ROWS
+    FETCH NEXT @limit ROWS ONLY
+  `);
+    request = new sql.Request(transaction);
+    const total = await request
+      .input('userId', sql.Int, userId)
+      .query(`
+    SELECT COUNT(*) AS total
+    FROM roomMembers rm
+    INNER JOIN rooms r ON rm.roomId = r.roomId
+    WHERE rm.userId = @userId 
+      AND rm.isDelete = 0
+      AND EXISTS (
+        SELECT 1
+        FROM messages m
+        WHERE m.roomId = r.roomId AND m.isDelete = 0
+      )
+  `);
 
     if (result.recordset.length > 0) {
       // Lấy ngày hiện tại để so sánh
@@ -254,6 +333,7 @@ async function getUserRooms(userId) {
       return {
         success: true,
         rooms: result.recordset, // Danh sách các phòng
+        total: total.recordset[0].total
       };
     } else {
       await transaction.rollback();

@@ -83,21 +83,21 @@ module.exports = function (io, socket) {
       const newMessage = {
         messageId,
         roomId,
-        userId,
-        message,
+        senderId:userId,
+        messageContent:message,
         userName: senderName,
-        sentAt: currentTime,
+        createdAt: currentTime,
       };
       const today = currentTime.toISOString().slice(0, 10); // Chỉ lấy phần ngày (yyyy-mm-dd)
-      const messageDate = new Date(newMessage.sentAt);
+      const messageDate = new Date(newMessage.createdAt);
       const messageDateString = messageDate.toISOString().slice(0, 10); // Lấy phần ngày để so sánh
 
       // Nếu ngày tin nhắn trùng với ngày hiện tại, chỉ trả về giờ và phút
       if (messageDateString === today) {
-        newMessage.sentAt = messageDate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+        newMessage.createdAt = messageDate.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
       } else {
         // Nếu khác ngày hiện tại, trả về ngày/tháng/năm và giờ/phút
-        newMessage.sentAt = messageDate.toLocaleString('en-GB', {
+        newMessage.createdAt = messageDate.toLocaleString('en-GB', {
           day: '2-digit',
           month: '2-digit',
           year: 'numeric',
@@ -154,7 +154,10 @@ module.exports = function (io, socket) {
   // Sự kiện khác liên quan đến socket (nếu có)
   // Xử lý sự kiện khi người dùng vào phòng chat
   socket.on('joinRoom', async (data) => {
+    console.log('vào đây');
+
     try {
+
       const { roomId } = data;
       const userId = socket.userId;
 
@@ -162,8 +165,6 @@ module.exports = function (io, socket) {
       if (!roomId) {
         return socket.emit('errorMessage', { message: 'Invalid room ID!' });
       }
-      console.log("joinRoom", roomId);
-
       // Kiểm tra xem người dùng có phải là thành viên của phòng hay không
       let request = new sql.Request(pool);
       const checkMemberResult = await request
@@ -180,17 +181,18 @@ module.exports = function (io, socket) {
 
       // Tham gia vào phòng
       socket.join(roomId);
-      console.log(`User ${socket.id} (UserID: ${userId}) joined room ${roomId}`);
-
       // Log danh sách các socket (thành viên) hiện tại trong phòng
-      const room = io.sockets.adapter.rooms.get(roomId);
+      const room = io.sockets.adapter.rooms.get(roomId); // Lấy thông tin phòng từ adapter
       if (room) {
-        const members = Array.from(room);  // Chuyển Set thành Array
+        const members = Array.from(room); // Chuyển Set thành Array
         console.log(`Members in room ${roomId}:`, members);
-      } else {
-        console.log(`No members in room ${roomId}`);
+        // Kiểm tra số lượng thành viên trong phòng
+        if (members.length === 2)
+          // Phòng có đủ 2 thành viên, phát sự kiện về client
+          io.to(roomId).emit('joinedRoom', { twoMember: true });
+        else
+          io.to(roomId).emit('joinedRoom', { twoMember: false });
       }
-
       // Cập nhật lại unreadMessagesCount về 0 khi người dùng vào phòng
       request = new sql.Request(pool);
       await request
@@ -202,8 +204,7 @@ module.exports = function (io, socket) {
         WHERE roomId = @roomId AND userId = @userId
       `);
 
-      // Phát sự kiện 'joinedRoom' về cho client sau khi tham gia thành công
-      socket.emit('joinedRoom', { roomId });
+
 
     } catch (error) {
       console.error('Error joining room:', error);
@@ -214,8 +215,12 @@ module.exports = function (io, socket) {
   // Phát tín hiệu khi tin nhắn được sửa
   socket.on('editMessage', async (data) => {
     try {
+      console.log('data',data);
+      
       // Lấy id và nội dung mới của tin nhắn
       const { messageId, newMessageContent, editedAt, roomId } = data;
+      console.log('messageId',messageId);
+      
       // Kiểm tra dữ liệu đầu vào
       if (!roomId, !messageId, !newMessageContent, !editedAt) {
         return socket.emit('errorMessage', { message: 'Invalid' });
@@ -236,26 +241,26 @@ module.exports = function (io, socket) {
   });
 
   // Phát tín hiệu khi tin nhắn được xóa
-socket.on('deleteMessage', async (data) => {
-  try {
-    const { messageId, roomId } = data;
-    // Kiểm tra dữ liệu đầu vào
-    if (!roomId || !messageId) {
-      return socket.emit('errorMessage', { message: 'Dữ liệu không hợp lệ!' });
+  socket.on('deleteMessage', async (data) => {
+    try {
+      const { messageId, roomId } = data;
+      // Kiểm tra dữ liệu đầu vào
+      if (!roomId || !messageId) {
+        return socket.emit('errorMessage', { message: 'Dữ liệu không hợp lệ!' });
+      }
+
+      // Phát tín hiệu cho tất cả các thành viên trong phòng
+      socket.to(roomId).emit('messageDeleted', {
+        messageId,
+        roomId,
+        isDelete: true
+      });
+
+    } catch (error) {
+      console.error('Lỗi khi xóa tin nhắn:', error);
+      socket.emit('errorMessage', { message: 'Lỗi trong quá trình xóa tin nhắn!' });
     }
-
-    // Phát tín hiệu cho tất cả các thành viên trong phòng
-    socket.to(roomId).emit('messageDeleted', {
-      messageId,
-      roomId,
-      isDelete: true
-    });
-
-  } catch (error) {
-    console.error('Lỗi khi xóa tin nhắn:', error);
-    socket.emit('errorMessage', { message: 'Lỗi trong quá trình xóa tin nhắn!' });
-  }
-});
+  });
 
 
 

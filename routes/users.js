@@ -87,11 +87,19 @@ router.post('/updateProfilePicture', authenticateToken, (req, res) => {
     // Cắt ảnh thành hình vuông 512x512 pixels
     const resizedImagePath = imagePath.replace(path.extname(imagePath), '_resized.png');
     sharp(imagePath)
-      .resize(512, 512) // Kích thước chuẩn
+      .resize(512, 512)
       .toFile(resizedImagePath)
       .then(() => {
-        // Xóa ảnh gốc sau khi resize (tùy chọn)
-        fs.unlinkSync(imagePath);
+        console.log('Đã resize ảnh thành công.');
+        // Xóa ảnh gốc không đồng bộ
+        fs.unlink(imagePath, (unlinkErr) => {
+          if (unlinkErr) {
+            console.error('Lỗi khi xóa file gốc:', unlinkErr);
+            // Không trả lỗi ở đây, vì ảnh đã được xử lý xong
+          } else {
+            console.log('File gốc đã được xóa.');
+          }
+        });
 
         // Lưu đường dẫn mới vào cơ sở dữ liệu
         const imageUrl = `${req.protocol}://${req.headers.host}/uploads/profilePictures/${path.basename(resizedImagePath)}`;
@@ -112,40 +120,42 @@ router.post('/updateProfilePicture', authenticateToken, (req, res) => {
         console.error('Lỗi khi xử lý ảnh:', imageError);
         return res.status(500).json({ success: false, message: 'Đã xảy ra lỗi khi xử lý ảnh.' });
       });
+
   });
 });
 
 //#endregion
 
 // API kiểm tra quyền truy cập ảnh
-router.get('/uploads/profilePictures/:filename', authenticateToken, async (req, res) => {
-  // #swagger.tags = ['User Profile']
-  // #swagger.summary = 'Lấy ảnh hồ sơ'
-  // #swagger.description = 'Endpoint để lấy ảnh hồ sơ người dùng với xác thực'
+// router.get('/uploads/profilePictures/:filename', authenticateToken, async (req, res) => {
+//   // #swagger.tags = ['User Profile']
+//   // #swagger.summary = 'Lấy ảnh hồ sơ'
+//   // #swagger.description = 'Endpoint để lấy ảnh hồ sơ người dùng với xác thực'
 
-  const { filename } = req.params; // Lấy tên file ảnh từ URL
-  const userId = req.user.userId;   // Lấy ID người dùng từ token đã xác thực
+//   const { filename } = req.params; // Lấy tên file ảnh từ URL
+//   const userId = req.user.userId;   // Lấy ID người dùng từ token đã xác thực
 
-  try {
-    // Gọi hàm kiểm tra xem người dùng hiện tại có quyền truy cập ảnh hay không
-    const hasAccess = await sql.hasAccessToProfilePicture(userId, filename);
+//   try {
+//     // Gọi hàm kiểm tra xem người dùng hiện tại có quyền truy cập ảnh hay không
+//     const hasAccess = await sql.hasAccessToProfilePicture(userId, filename);
 
-    if (!hasAccess) {
-      return res.status(403).json({ success: false, message: 'Bạn không có quyền truy cập ảnh này!' });
-    }
+//     if (!hasAccess) {
+//       return res.status(403).json({ success: false, message: 'Bạn không có quyền truy cập ảnh này!' });
+//     }
 
-    // Trả về file ảnh nếu tồn tại
-    const filePath = path.join(__dirname, '../uploads/profilePictures', filename);
-    if (fs.existsSync(filePath)) {
-      res.sendFile(filePath);
-    } else {
-      res.status(404).json({ success: false, message: 'Ảnh không tồn tại!' });
-    }
-  } catch (error) {
-    console.error('Lỗi khi truy xuất ảnh:', error);
-    res.status(500).json({ success: false, message: 'Đã xảy ra lỗi khi truy xuất ảnh.' });
-  }
-});
+//     // Trả về file ảnh nếu tồn tại
+//     const filePath = path.join(__dirname, '../uploads/profilePictures', filename);
+//     if (fs.existsSync(filePath)) {
+//       res.sendFile(filePath);
+//     } else {
+//       res.status(404).json({ success: false, message: 'Ảnh không tồn tại!' });
+//     }
+//   } catch (error) {
+//     console.error('Lỗi khi truy xuất ảnh:', error);
+//     res.status(500).json({ success: false, message: 'Đã xảy ra lỗi khi truy xuất ảnh.' });
+//   }
+// });
+
 
 // API cập nhật tên người dùng
 router.put('/updateUserName', authenticateToken, async (req, res) => {
@@ -196,7 +206,7 @@ router.post('/changePassword', authenticateToken, async function (req, res) {
   // if (newPassword.length < 8) {
   //   return res.status(400).json({ success: false, message: "Mật khẩu mới phải có ít nhất 8 ký tự." });
   // }
- 
+
 
   try {
     // Gọi hàm xử lý từ file handleIndex
