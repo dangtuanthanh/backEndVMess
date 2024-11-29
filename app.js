@@ -31,7 +31,7 @@ const cors = require('cors');
 const allowedOrigins = [
   'http://localhost:3000',
   'https://frontendvmess.onrender.com',
-  'http://3.nhahang.xyz'
+  'https://3.nhahang.xyz'
 ];
 
 app.use(cors({
