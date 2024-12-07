@@ -118,7 +118,7 @@ router.post('/login', async function (req, res) {
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,   
         secure: true,    
-        sameSite: "Strict",
+        sameSite: "None",
         maxAge: 7 * 24 * 60 * 60 * 1000
       });
 
@@ -221,7 +221,7 @@ router.post('/logout', async function (req, res) {
       res.cookie('refreshToken', '', {
         httpOnly: true,
         secure: true, // Nếu triển khai thực tế, nên đặt thành true khi sử dụng HTTPS
-        sameSite: "Strict",
+        sameSite: "None",
         maxAge: 0 // Xóa cookie ngay lập tức
       });
 
@@ -263,7 +263,7 @@ router.post('/googleLogin', async function (req, res) {
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,   // Chỉ cho phép HTTP truy cập, không cho JavaScript
         secure: false,    // Tạm thời không bật chế độ bảo mật HTTPS
-        sameSite: 'Lax', // Không gửi cookie với các request ngoài cùng nguồn
+        sameSite: 'None', 
         maxAge: 7 * 24 * 60 * 60 * 1000 // Thời gian sống 7 ngày
       });
       return res.status(200).json({
@@ -329,7 +329,7 @@ router.post('/verifyResetCode', async function (req, res) {
       res.cookie('tempToken', result.tempToken, {
         httpOnly: true,   // Chỉ cho phép HTTP truy cập, không cho JavaScript
         secure: false,    // Tạm thời không bật chế độ bảo mật HTTPS
-        sameSite: 'Lax', // Không gửi cookie với các request ngoài cùng nguồn
+        sameSite: 'None', // Không gửi cookie với các request ngoài cùng nguồn
         maxAge: 15 * 60 * 1000  // Thời gian sống 15p
       });
       res.status(200).json({ success: true, message: "Mã xác thực hợp lệ. Bạn có thể đổi mật khẩu." });
