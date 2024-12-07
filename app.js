@@ -35,17 +35,22 @@ const allowedOrigins = [
 ];
 
 app.use(cors({
-  origin: function (origin, callback) {
-    if (!origin || allowedOrigins.includes(origin)) {
-      // Nếu origin không có (cho các request từ cùng nguồn) hoặc hợp lệ
-      callback(null, true);
-    } else {
-      // Nếu origin không được phép
-      callback(new Error('Not allowed by CORS'));
-    }
-  },
-  credentials: true // Cho phép cookie
+  origin: allowedOrigins, // Danh sách domain được phép
+  credentials: true // Cho phép gửi cookie
 }));
+
+// app.use(cors({
+//   origin: function (origin, callback) {
+//     if (!origin || allowedOrigins.includes(origin)) {
+//       // Nếu origin không có (cho các request từ cùng nguồn) hoặc hợp lệ
+//       callback(null, true);
+//     } else {
+//       // Nếu origin không được phép
+//       callback(new Error('Not allowed by CORS'));
+//     }
+//   },
+//   credentials: true // Cho phép cookie
+// }));
 
 
 // app.use(cors());
@@ -75,7 +80,7 @@ app.use('/api', swaggerUi.serve, swaggerUi.setup(swaggerDocument));
 
 
 
-app.use('/', indexRouter,indexRoom,indexMessage,indexUsers);
+app.use('/', indexRouter, indexRoom, indexMessage, indexUsers);
 
 // catch 404 and forward to error handler
 app.use(function (req, res, next) {
