@@ -118,7 +118,7 @@ router.post('/login', async function (req, res) {
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,   // Chỉ cho phép HTTP truy cập, không cho JavaScript
         secure: true,    // Tạm thời không bật chế độ bảo mật HTTPS
-        sameSite: 'strict', // Không gửi cookie với các request ngoài cùng nguồn
+        sameSite: None, // Không gửi cookie với các request ngoài cùng nguồn
         maxAge: 7 * 24 * 60 * 60 * 1000 // Thời gian sống 7 ngày
       });
 
@@ -221,7 +221,7 @@ router.post('/logout', async function (req, res) {
       res.cookie('refreshToken', '', {
         httpOnly: true,
         secure: true, // Nếu triển khai thực tế, nên đặt thành true khi sử dụng HTTPS
-        sameSite: 'strict',
+        sameSite: None,
         maxAge: 0 // Xóa cookie ngay lập tức
       });
 
