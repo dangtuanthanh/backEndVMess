@@ -262,7 +262,7 @@ router.post('/googleLogin', async function (req, res) {
       await sql.saveRefreshToken(result.userId, refreshToken);
       res.cookie('refreshToken', refreshToken, {
         httpOnly: true,   // Chỉ cho phép HTTP truy cập, không cho JavaScript
-        secure: false,    // Tạm thời không bật chế độ bảo mật HTTPS
+        secure: true,    // Tạm thời không bật chế độ bảo mật HTTPS
         sameSite: 'None', 
         maxAge: 7 * 24 * 60 * 60 * 1000 // Thời gian sống 7 ngày
       });
@@ -328,7 +328,7 @@ router.post('/verifyResetCode', async function (req, res) {
     if (result.success) {
       res.cookie('tempToken', result.tempToken, {
         httpOnly: true,   // Chỉ cho phép HTTP truy cập, không cho JavaScript
-        secure: false,    // Tạm thời không bật chế độ bảo mật HTTPS
+        secure: true,    // Tạm thời không bật chế độ bảo mật HTTPS
         sameSite: 'None', // Không gửi cookie với các request ngoài cùng nguồn
         maxAge: 15 * 60 * 1000  // Thời gian sống 15p
       });
