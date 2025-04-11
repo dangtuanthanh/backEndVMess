@@ -32,7 +32,7 @@ router.post('/register', async function (req, res) {
   // #swagger.summary = 'Đăng ký tài khoản mới'
   // #swagger.description = 'Endpoint để đăng ký tài khoản mới với email và mật khẩu.'
   const { email, password } = req.body;
-
+console.log("req",req);
   // Kiểm tra dữ liệu đầu vào
   if (!email || !password) {
     return res.status(400).json({ success: false, message: "Dữ liệu gửi lên không chính xác!" });
